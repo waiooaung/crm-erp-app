@@ -3,19 +3,17 @@
 namespace App\Filament\Resources\AssetTransactions\Pages;
 
 use App\Filament\Resources\AssetTransactions\AssetTransactionResource;
-use Filament\Actions\DeleteAction;
-use Filament\Actions\ViewAction;
-use Filament\Resources\Pages\EditRecord;
+use Filament\Actions\EditAction;
+use Filament\Resources\Pages\ViewRecord;
 
-class EditAssetTransaction extends EditRecord
+class ViewAssetTransaction extends ViewRecord
 {
     protected static string $resource = AssetTransactionResource::class;
 
     protected function getHeaderActions(): array
     {
         return [
-            ViewAction::make(),
-            DeleteAction::make(),
+            EditAction::make(),
         ];
     }
 }

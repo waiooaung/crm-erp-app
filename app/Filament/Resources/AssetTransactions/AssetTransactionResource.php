@@ -5,7 +5,9 @@ namespace App\Filament\Resources\AssetTransactions;
 use App\Filament\Resources\AssetTransactions\Pages\CreateAssetTransaction;
 use App\Filament\Resources\AssetTransactions\Pages\EditAssetTransaction;
 use App\Filament\Resources\AssetTransactions\Pages\ListAssetTransactions;
+use App\Filament\Resources\AssetTransactions\Pages\ViewAssetTransaction;
 use App\Filament\Resources\AssetTransactions\Schemas\AssetTransactionForm;
+use App\Filament\Resources\AssetTransactions\Schemas\AssetTransactionInfolist;
 use App\Filament\Resources\AssetTransactions\Tables\AssetTransactionsTable;
 use App\Models\AssetTransaction;
 use BackedEnum;
@@ -27,6 +29,11 @@ class AssetTransactionResource extends Resource
         return AssetTransactionForm::configure($schema);
     }
 
+    public static function infolist(Schema $schema): Schema
+    {
+        return AssetTransactionInfolist::configure($schema);
+    }
+
     public static function table(Table $table): Table
     {
         return AssetTransactionsTable::configure($table);
@@ -44,6 +51,7 @@ class AssetTransactionResource extends Resource
         return [
             'index' => ListAssetTransactions::route('/'),
             'create' => CreateAssetTransaction::route('/create'),
+            'view' => ViewAssetTransaction::route('/{record}'),
             'edit' => EditAssetTransaction::route('/{record}/edit'),
         ];
     }

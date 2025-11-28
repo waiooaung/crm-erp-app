@@ -5,7 +5,9 @@ namespace App\Filament\Resources\Activities;
 use App\Filament\Resources\Activities\Pages\CreateActivity;
 use App\Filament\Resources\Activities\Pages\EditActivity;
 use App\Filament\Resources\Activities\Pages\ListActivities;
+use App\Filament\Resources\Activities\Pages\ViewActivity;
 use App\Filament\Resources\Activities\Schemas\ActivityForm;
+use App\Filament\Resources\Activities\Schemas\ActivityInfolist;
 use App\Filament\Resources\Activities\Tables\ActivitiesTable;
 use App\Models\Activity;
 use BackedEnum;
@@ -27,6 +29,11 @@ class ActivityResource extends Resource
         return ActivityForm::configure($schema);
     }
 
+    public static function infolist(Schema $schema): Schema
+    {
+        return ActivityInfolist::configure($schema);
+    }
+
     public static function table(Table $table): Table
     {
         return ActivitiesTable::configure($table);
@@ -44,6 +51,7 @@ class ActivityResource extends Resource
         return [
             'index' => ListActivities::route('/'),
             'create' => CreateActivity::route('/create'),
+            'view' => ViewActivity::route('/{record}'),
             'edit' => EditActivity::route('/{record}/edit'),
         ];
     }

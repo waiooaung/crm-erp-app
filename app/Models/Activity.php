@@ -28,5 +28,20 @@ use Illuminate\Database\Eloquent\Model;
  */
 class Activity extends Model
 {
-    //
+    /**
+     * The attributes that are mass assignable.
+     *
+     * @var list<string>
+     */
+    protected $fillable = ['user_id', 'entity_id', 'entity', 'action', 'changes'];
+
+    public function user()
+    {
+        return $this->belongsTo(User::class, 'user_id');
+    }
+
+    public function asset()
+    {
+        return $this->belongsTo(Asset::class, 'entity_id');
+    }
 }

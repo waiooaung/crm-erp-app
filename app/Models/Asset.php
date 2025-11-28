@@ -55,6 +55,29 @@ class Asset extends Model
         'value' => 'float',
     ];
 
+    protected static function booted()
+    {
+        static::created(function ($asset) {
+            $asset->logActivity('CREATED');
+        });
+
+        static::updated(function ($asset) {
+            $changes = $asset->getChanges(); // only changed attributes
+            $asset->logActivity('UPDATED', $changes);
+        });
+    }
+
+    public function logActivity(string $action, array $changes = null)
+    {
+        Activity::create([
+            'user_id' => auth()->id(),
+            'entity' => strtolower(class_basename($this)),
+            'entity_id' => $this->id,
+            'action' => $action,
+            'changes' => json_encode($this->getChanges()),
+        ]);
+    }
+
     public function assignedUser()
     {
         return $this->belongsTo(User::class, 'assigned_to_user_id');
@@ -68,5 +91,10 @@ class Asset extends Model
     public function assetTransactions()
     {
         return $this->hasMany(AssetTransaction::class);
+    }
+
+    public function activities()
+    {
+        return $this->hasMany(Activity::class);
     }
 }
