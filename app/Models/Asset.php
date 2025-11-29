@@ -2,6 +2,7 @@
 
 namespace App\Models;
 
+use App\Traits\Loggable;
 use Illuminate\Database\Eloquent\Model;
 
 /**
@@ -36,10 +37,15 @@ use Illuminate\Database\Eloquent\Model;
  * @method static \Illuminate\Database\Eloquent\Builder<static>|Asset whereUpdatedAt($value)
  * @method static \Illuminate\Database\Eloquent\Builder<static>|Asset whereValue($value)
  * @method static \Illuminate\Database\Eloquent\Builder<static>|Asset whereWarrantyExpiry($value)
+ * @property-read \Illuminate\Database\Eloquent\Collection<int, \App\Models\Activity> $activities
+ * @property-read int|null $activities_count
+ * @property-read \Illuminate\Database\Eloquent\Collection<int, \App\Models\File> $files
+ * @property-read int|null $files_count
  * @mixin \Eloquent
  */
 class Asset extends Model
 {
+    use Loggable;
     /**
      * The attributes that are mass assignable.
      *
@@ -95,6 +101,14 @@ class Asset extends Model
 
     public function activities()
     {
-        return $this->hasMany(Activity::class);
+        return $this->hasMany(Activity::class, 'entity_id')->where('entity', 'asset');
+    }
+
+    /**
+     * @return \Illuminate\Database\Eloquent\Relations\HasMany<\App\Models\File>
+     */
+    public function files()
+    {
+        return $this->hasMany(File::class);
     }
 }

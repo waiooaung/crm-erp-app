@@ -5,9 +5,12 @@ namespace App\Filament\Resources\Assets\Schemas;
 use App\Models\Department;
 use App\Models\User;
 use Filament\Forms\Components\DatePicker;
+use Filament\Forms\Components\FileUpload;
 use Filament\Forms\Components\Select;
 use Filament\Forms\Components\TextInput;
 use Filament\Schemas\Schema;
+use Livewire\Features\SupportFileUploads\TemporaryUploadedFile;
+use Str;
 
 class AssetForm
 {
@@ -40,6 +43,17 @@ class AssetForm
             DatePicker::make('purchase_date'),
             DatePicker::make('warranty_expiry'),
             TextInput::make('value')->numeric(),
+            FileUpload::make('attachments')
+                ->label('Attachments')
+                ->multiple()
+                ->enableDownload()
+                ->acceptedFileTypes(['image/jpeg', 'image/png'])
+                ->disk('public')
+                ->directory('assets')
+                ->getUploadedFileNameForStorageUsing(function (TemporaryUploadedFile $file): string {
+                    $extension = $file->getClientOriginalExtension();
+                    return 'asset-' . Str::uuid() . '.' . $extension;
+                })
         ]);
     }
 }

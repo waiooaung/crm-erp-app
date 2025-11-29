@@ -24,6 +24,7 @@ use Illuminate\Database\Eloquent\Model;
  * @method static \Illuminate\Database\Eloquent\Builder<static>|Activity whereId($value)
  * @method static \Illuminate\Database\Eloquent\Builder<static>|Activity whereUpdatedAt($value)
  * @method static \Illuminate\Database\Eloquent\Builder<static>|Activity whereUserId($value)
+ * @property-read \App\Models\User $user
  * @mixin \Eloquent
  */
 class Activity extends Model
@@ -35,13 +36,12 @@ class Activity extends Model
      */
     protected $fillable = ['user_id', 'entity_id', 'entity', 'action', 'changes'];
 
+    protected $casts = [
+        'changes' => 'array',
+    ];
+
     public function user()
     {
         return $this->belongsTo(User::class, 'user_id');
-    }
-
-    public function asset()
-    {
-        return $this->belongsTo(Asset::class, 'entity_id');
     }
 }

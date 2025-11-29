@@ -5,6 +5,8 @@ namespace App\Filament\Resources\Assets;
 use App\Filament\Resources\Assets\Pages\CreateAsset;
 use App\Filament\Resources\Assets\Pages\EditAsset;
 use App\Filament\Resources\Assets\Pages\ListAssets;
+use App\Filament\Resources\Assets\RelationManagers\ActivitiesRelationManager;
+use App\Filament\Resources\Assets\RelationManagers\FilesRelationManager;
 use App\Filament\Resources\Assets\RelationManagers\TransactionsRelationManager;
 use App\Filament\Resources\Assets\Schemas\AssetForm;
 use App\Filament\Resources\Assets\Tables\AssetsTable;
@@ -19,7 +21,9 @@ class AssetResource extends Resource
 {
     protected static ?string $model = Asset::class;
 
-    protected static string|BackedEnum|null $navigationIcon = Heroicon::OutlinedRectangleStack;
+    protected static string|BackedEnum|null $navigationIcon = Heroicon::OutlinedArchiveBox;
+
+    protected static ?int $navigationSort = 1;
 
     public static function form(Schema $schema): Schema
     {
@@ -33,7 +37,11 @@ class AssetResource extends Resource
 
     public static function getRelations(): array
     {
-        return [TransactionsRelationManager::class];
+        return [
+            FilesRelationManager::class,
+            ActivitiesRelationManager::class,
+            TransactionsRelationManager::class
+        ];
     }
 
     public static function getPages(): array
