@@ -2,10 +2,7 @@
 
 namespace App\Filament\Resources\Activities\Tables;
 
-use Filament\Actions\BulkActionGroup;
-use Filament\Actions\DeleteBulkAction;
-use Filament\Actions\EditAction;
-use Filament\Actions\ViewAction;
+use App\Models\Asset;
 use Filament\Tables\Columns\TextColumn;
 use Filament\Tables\Table;
 
@@ -15,36 +12,30 @@ class ActivitiesTable
     {
         return $table
             ->columns([
-                TextColumn::make('user_id')
-                    ->numeric()
+                TextColumn::make('user.name')
+                    ->label('User')
                     ->sortable(),
                 TextColumn::make('entity')
                     ->searchable(),
                 TextColumn::make('entity_id')
-                    ->numeric()
+                    ->label('Entity Data')
+                    ->formatStateUsing(function ($state, $record) {
+                        if ($record->entity === 'asset') {
+                            return Asset::find($state)?->name ?? '—';
+                        }
+
+                        return $state;
+                    })
                     ->sortable(),
                 TextColumn::make('action')
                     ->searchable(),
                 TextColumn::make('created_at')
                     ->dateTime()
-                    ->sortable()
-                    ->toggleable(isToggledHiddenByDefault: true),
+                    ->sortable(),
                 TextColumn::make('updated_at')
                     ->dateTime()
                     ->sortable()
                     ->toggleable(isToggledHiddenByDefault: true),
-            ])
-            ->filters([
-                //
-            ])
-            ->recordActions([
-                ViewAction::make(),
-                EditAction::make(),
-            ])
-            ->toolbarActions([
-                BulkActionGroup::make([
-                    DeleteBulkAction::make(),
-                ]),
             ]);
     }
 }
