@@ -2,10 +2,6 @@
 
 namespace App\Filament\Resources\AssetTransactions\Tables;
 
-use Filament\Actions\BulkActionGroup;
-use Filament\Actions\DeleteBulkAction;
-use Filament\Actions\EditAction;
-use Filament\Actions\ViewAction;
 use Filament\Tables\Columns\TextColumn;
 use Filament\Tables\Table;
 
@@ -15,37 +11,24 @@ class AssetTransactionsTable
     {
         return $table
             ->columns([
-                TextColumn::make('asset_id')
-                    ->numeric()
+                TextColumn::make('asset.name')
+                    ->label('Asset')
                     ->sortable(),
-                TextColumn::make('user_id')
-                    ->numeric()
+                TextColumn::make('user.name')
+                    ->label('User')
                     ->sortable(),
-                TextColumn::make('department_id')
-                    ->numeric()
+                TextColumn::make('department.name')
+                    ->label('Department')
                     ->sortable(),
                 TextColumn::make('action')
                     ->badge(),
                 TextColumn::make('created_at')
                     ->dateTime()
-                    ->sortable()
-                    ->toggleable(isToggledHiddenByDefault: true),
+                    ->sortable(),
                 TextColumn::make('updated_at')
                     ->dateTime()
                     ->sortable()
                     ->toggleable(isToggledHiddenByDefault: true),
-            ])
-            ->filters([
-                //
-            ])
-            ->recordActions([
-                ViewAction::make(),
-                EditAction::make(),
-            ])
-            ->toolbarActions([
-                BulkActionGroup::make([
-                    DeleteBulkAction::make(),
-                ]),
             ]);
     }
 }
