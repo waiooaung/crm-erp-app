@@ -20,9 +20,15 @@ use Illuminate\Database\Eloquent\Model;
  * @method static \Illuminate\Database\Eloquent\Builder<static>|File whereFilePath($value)
  * @method static \Illuminate\Database\Eloquent\Builder<static>|File whereId($value)
  * @method static \Illuminate\Database\Eloquent\Builder<static>|File whereUpdatedAt($value)
+ * @property-read \App\Models\Asset $asset
  * @mixin \Eloquent
  */
 class File extends Model
 {
-    //
+    protected $fillable = ['asset_id', 'file_name', 'file_path'];
+
+    public function asset()
+    {
+        return $this->belongsTo(Asset::class);
+    }
 }
