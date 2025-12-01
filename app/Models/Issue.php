@@ -86,7 +86,7 @@ class Issue extends Model
         });
     }
 
-    public function logActivity(string $action, array $changes = null)
+    public function logActivity(string $action, ?array $changes = null)
     {
         Activity::create([
             'user_id' => auth()->id(),
