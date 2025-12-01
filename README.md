@@ -1,127 +1,108 @@
-Mini CRM/ERP System
-<p align="center"> <img src="https://raw.githubusercontent.com/laravel/art/master/logo-lockup/5%20SVG/2%20CMYK/1%20Full%20Color/laravel-logolockup-cmyk-red.svg" width="300" alt="Laravel Logo"> </p> <p align="center"> <a href="https://github.com/laravel/framework/actions"><img src="https://github.com/laravel/framework/workflows/tests/badge.svg" alt="Build Status"></a> <a href="https://packagist.org/packages/laravel/framework"><img src="https://img.shields.io/packagist/v/laravel/framework" alt="Laravel Version"></a> <a href="https://opensource.org/licenses/MIT"><img src="https://img.shields.io/badge/license-MIT-blue.svg" alt="License"></a> </p>
-About the Project
+<p align="center"><a href="https://filamentphp.com" target="_blank"><img src="https://www.google.com/search?q=https://filamentphp.com/images/og.jpg" width="400" alt="Filament Logo"></a></p>
 
-This is a mini CRM/ERP system built on Laravel with Filament Admin Panel. It allows you to:
+AI-Powered Asset Management System
 
-Manage Users, Departments, Assets, and Issues
+An intelligent IT Asset Management (ITAM) system built with Laravel 11 and Filament V3. This application leverages OpenAI to automate data entry, classify maintenance issues, and generate natural language summaries for assets.
 
-Track assigned assets and reported issues
+🚀 Key AI Features
 
-Role-based access (Admin, Manager, Staff)
+This is not just a CRUD application. It includes several AI-powered modules:
 
-Real-time admin panel using Filament
+✨ AI Asset Summarizer: Automatically generates concise, human-readable status summaries based on asset history and transaction logs.
 
-Features
+🤖 Smart Categorization: Auto-suggests asset categories based on model names during data entry.
 
-Admin panel at /admin
+🔧 AI Issue Classifier: Analyzes user-reported issue descriptions to determine if the problem is Hardware, Software, or User Error, and assigns an appropriate Priority Level (Low/High/Critical).
 
-Custom welcome screen
+🔍 Natural Language Search: (Optional) Interpret complex user queries like "Show me all broken laptops assigned to John" into database filters.
 
-Role-based user access
+🧾 Audit Logs: Detailed, readable activity logs tracking exactly what changed (e.g., "Status changed from In Stock → Assigned").
 
-Seeded demo data for users, departments, assets, and issues
+🛠️ Prerequisites
 
-Fully functional CRUD for all entities
+Before you begin, ensure you have the following installed:
 
-Requirements
-
-PHP 8.1+
+PHP 8.2 or higher
 
 Composer
 
-MySQL / MariaDB / PostgreSQL
+MySQL or MariaDB
 
-Node.js & npm (for assets)
+Node.js & NPM (for building assets)
 
-Installation & Setup
+OpenAI API Key (Required for AI features)
 
-Clone the repository:
+📦 Installation Guide
 
-git clone <your-repo-url>
-cd <your-project-folder>
+Follow these steps to get the project running on your local machine.
+
+1. Clone the Repository
+
+git clone [git@github.com:waiooaung/crm-erp-app.git]
+cd crm-erp-app
 
 
-Install dependencies:
+2. Install Dependencies
+
+Install PHP and JavaScript dependencies:
 
 composer install
-npm install
-npm run dev
+npm install && npm run build
 
 
-Copy .env file and generate application key:
+3. Environment Setup
+
+Copy the example environment file:
 
 cp .env.example .env
+
+
+4. Generate Application Key
+
+Generate the unique application encryption key:
+
 php artisan key:generate
 
-Database Setup
 
-Create a database in MySQL (or your preferred DB)
+5. Configure Database & API Key
 
-Update .env with your DB credentials:
+Open the .env file in your code editor and update the following lines:
 
 DB_CONNECTION=mysql
 DB_HOST=127.0.0.1
 DB_PORT=3306
-DB_DATABASE=mini_crm
+DB_DATABASE=your_database_name
 DB_USERNAME=root
 DB_PASSWORD=
 
-
-Run migrations:
-
-php artisan migrate
+# Add your OpenAI Key here
+OPENAI_API_KEY=sk-proj-xxxxxxxxxxxxxxxxxxxxxxxx
 
 
-Seed the database with sample data:
+6. Migrate and Seed Database
 
-php artisan db:seed
+Run the migrations to create the tables (assets, issues, activities, etc.) and seed sample data:
+
+php artisan migrate --seed
 
 
-This will create:
+7. Link Storage
 
-Departments (HR, IT, Finance, Operations)
+Create the symbolic link for uploading images/receipts:
 
-Users (Admin + Manager + Staff)
+php artisan storage:link
 
-Sample Assets and Issues
 
-Admin Panel
+8. Create an Admin User
 
-Access the admin panel at: http://localhost:8000/admin
+If you didn't seed a specific user, create a Filament admin user manually:
 
-Use seeded Admin user to login:
+php artisan make:filament-user
+# Follow the prompts to enter Name, Email, and Password
 
-Email: admin@example.com
-Password: password
 
-Contributing
+🏁 Running the Application
 
-Contributions are welcome! Please follow Laravel’s Code of Conduct
-.
+Start the local development server:
 
-License
-
-This project is open-sourced software licensed under the MIT license
-.
-
-Commands Summary
-# Install PHP dependencies
-composer install
-
-# Install JS dependencies
-npm install
-npm run dev
-
-# Copy env and generate key
-cp .env.example .env
-php artisan key:generate
-
-# Run migrations
-php artisan migrate
-
-# Seed database
-php artisan db:seed
-
-# Run the app locally
 php artisan serve
