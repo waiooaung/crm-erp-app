@@ -2,64 +2,68 @@ name: Deploy to DigitalOcean
 
 on:
   push:
-    branches: ["main"]
+    branches: [ "main" ]
 
 jobs:
   deploy:
     runs-on: ubuntu-latest
 
     steps:
-      - name: Checkout code
-        uses: actions/checkout@v4
+    - name: Checkout code
+      uses: actions/checkout@v4
 
-      - name: Deploy to Server via SSH
-        uses: appleboy/ssh-action@v1.0.3
-        with:
-          host: ${{ secrets.DO_HOST }}
-          username: ${{ secrets.DO_USERNAME }}
-          password: ${{ secrets.DO_PASSWORD }}
-          port: 22
-          script: |
-            # Navigate to project
-            cd /var/www/crm-erp-app
+    - name: Deploy to Server via SSH
+      uses: appleboy/ssh-action@v1.0.3
+      with:
+        host: ${{ secrets.DO_HOST }}
+        username: ${{ secrets.DO_USERNAME }}
+        password: ${{ secrets.DO_PASSWORD }}
+        port: 22
+        script: |
+          # 1. Fix Git Ownership Issue
+          git config --global --add safe.directory /var/www/crm-erp-app
 
-            # Enable Maintenance Mode
-            php artisan down
+          # Navigate to project
+          cd /var/www/crm-erp-app
 
-            # Pull latest changes
-            git pull origin main
+          # 2. Safely Enable Maintenance Mode (Only if artisan works)
+          if [ -f artisan ]; then
+              php artisan down || true
+          fi
 
-            # Install PHP Dependencies
-            composer install --no-dev --optimize-autoloader
+          # Pull latest changes
+          git pull origin main
 
-            # Install JS Dependencies & Build
-            npm install
-            npm run build
+          # 3. Install PHP Dependencies (Now using PHP 8.4 on server)
+          composer install --no-dev --optimize-autoloader
 
-            # Run Migrations (Force is required in production)
-            php artisan migrate --force
+          # Install JS Dependencies & Build
+          npm install
+          npm run build
 
-            # Link Storage
-            php artisan storage:link
+          # Run Migrations
+          php artisan migrate --force
 
-            # Filament V4 optimizations
-            php artisan filament:optimize
-            php artisan icons:cache
+          # Link Storage
+          php artisan storage:link
 
-            # Clear and Cache Config/Routes
-            php artisan optimize:clear
-            php artisan config:cache
-            php artisan route:cache
-            php artisan view:cache
+          # Filament optimizations
+          php artisan filament:optimize
+          php artisan icons:cache
 
-            # Fix Permissions
-            sudo chown -R www-data:www-data /var/www/crm-erp-app
+          # Clear caches
+          php artisan optimize:clear
+          php artisan config:cache
+          php artisan route:cache
+          php artisan view:cache
 
-            # DB migration
-            php artisan migrate --force
+          # 4. Fix Permissions (Crucial step)
+          sudo chown -R www-data:www-data /var/www/crm-erp-app
+          sudo chmod -R 775 /var/www/crm-erp-app/storage
+          sudo chmod -R 775 /var/www/crm-erp-app/bootstrap/cache
 
-            # Run Database Seeders (Force is required in production)
-            php artisan db:seed --force
+          # Run Seeders
+          php artisan db:seed --force
 
-            # Bring site back up
-            php artisan up
+          # Bring site back up
+          php artisan up
