@@ -8,6 +8,10 @@ use Filament\Widgets\StatsOverviewWidget\Stat;
 
 class AssetStats extends StatsOverviewWidget
 {
+    protected static ?int $sort = 1;
+
+    protected ?string $pollingInterval = '15s';
+
     protected function getStats(): array
     {
         return [Stat::make('Total Assets', Asset::count()), Stat::make('Available Assets', Asset::where('status', 'AVAILABLE')->count()), Stat::make('Assigned Assets', Asset::where('status', 'ASSIGNED')->count()), Stat::make('Expiring Warranty', Asset::whereDate('warranty_expiry', '<=', now()->addMonth())->count())];

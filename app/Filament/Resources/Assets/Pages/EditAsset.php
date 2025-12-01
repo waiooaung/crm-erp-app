@@ -18,6 +18,11 @@ class EditAsset extends EditRecord
         ];
     }
 
+    protected function getRedirectUrl(): string
+    {
+        return $this->getResource()::getUrl('index');
+    }
+
     protected function afterSave(): void
     {
         $attachments = $this->data['attachments'] ?? [];

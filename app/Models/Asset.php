@@ -1,9 +1,10 @@
 <?php
 
 namespace App\Models;
-
-use App\Traits\Loggable;
+use Carbon\Carbon;
 use Illuminate\Database\Eloquent\Model;
+use App\Models\User;
+use App\Models\Department;
 
 /**
  * @property int $id
@@ -41,17 +42,18 @@ use Illuminate\Database\Eloquent\Model;
  * @property-read int|null $activities_count
  * @property-read \Illuminate\Database\Eloquent\Collection<int, \App\Models\File> $files
  * @property-read int|null $files_count
+ * @property string|null $summary
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|Asset whereSummary($value)
  * @mixin \Eloquent
  */
 class Asset extends Model
 {
-    use Loggable;
     /**
      * The attributes that are mass assignable.
      *
      * @var list<string>
      */
-    protected $fillable = ['name', 'category', 'serial_number', 'status', 'assigned_to_user_id', 'assigned_to_department_id', 'purchase_date', 'warranty_expiry', 'value'];
+    protected $fillable = ['name', 'category', 'serial_number', 'status', 'assigned_to_user_id', 'assigned_to_department_id', 'purchase_date', 'warranty_expiry', 'value', 'summary'];
 
     protected $casts = [
         'purchase_date' => 'datetime',
@@ -61,16 +63,54 @@ class Asset extends Model
         'value' => 'float',
     ];
 
+    public $tempChanges = [];
+
     protected static function booted()
     {
         static::created(function ($asset) {
             $asset->logActivity('CREATED');
         });
 
-        static::updated(function ($asset) {
-            $changes = $asset->getChanges(); // only changed attributes
-            $asset->logActivity('UPDATED', $changes);
+        static::updating(function ($asset) {
+            $changes = [];
+            foreach ($asset->getDirty() as $key => $value) {
+                if ($key === 'updated_at') continue;
+
+                // Capture Raw Values
+                $rawFrom = $asset->getOriginal($key);
+                $rawTo   = $value;
+
+                // CONVERT TO READABLE TEXT HERE
+                $changes[$key] = [
+                    'from' => self::formatChangeValue($key, $rawFrom),
+                    'to'   => self::formatChangeValue($key, $rawTo),
+                ];
+            }
+            $asset->tempChanges = $changes;
         });
+
+        static::updated(function ($asset) {
+            if (!empty($asset->tempChanges)) {
+                $asset->logActivity('UPDATED', $asset->tempChanges);
+            }
+        });
+    }
+
+    /**
+     * Helper to convert IDs/Dates to readable text
+     */
+    private static function formatChangeValue($key, $value)
+    {
+        if ($value === null) return '—';
+
+        return match ($key) {
+            'assigned_to_user_id' => User::find($value)?->name ?? 'Unknown User',
+            'assigned_to_department_id' => Department::find($value)?->name ?? 'Unknown Dept',
+            'purchase_date', 'warranty_expiry' => Carbon::parse($value)->format('M d, Y'),
+            'value' => number_format((float)$value, 2) . ' USD',
+            'status' => ucfirst(strtolower($value)),
+            default => (string) $value,
+        };
     }
 
     public function logActivity(string $action, array $changes = null)
@@ -80,7 +120,7 @@ class Asset extends Model
             'entity' => strtolower(class_basename($this)),
             'entity_id' => $this->id,
             'action' => $action,
-            'changes' => json_encode($this->getChanges()),
+            'changes' => $changes ? json_encode($changes) : null,
         ]);
     }
 

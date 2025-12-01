@@ -22,9 +22,9 @@ class ActivityResource extends Resource
 
     protected static string|BackedEnum|null $navigationIcon = Heroicon::OutlinedClock;
 
-    protected static ?string $recordTitleAttribute = 'Activity';
+    protected static ?string $recordTitleAttribute = 'action';
 
-    protected static ?int $navigationSort = 4;
+    protected static ?int $navigationSort = 5;
 
     public static function form(Schema $schema): Schema
     {
@@ -52,9 +52,6 @@ class ActivityResource extends Resource
     {
         return [
             'index' => ListActivities::route('/'),
-            'create' => CreateActivity::route('/create'),
-            'view' => ViewActivity::route('/{record}'),
-            'edit' => EditActivity::route('/{record}/edit'),
         ];
     }
 }

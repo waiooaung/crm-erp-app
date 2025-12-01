@@ -11,10 +11,11 @@ use Filament\Actions\BulkActionGroup;
 use Filament\Actions\DeleteBulkAction;
 use Filament\Actions\EditAction;
 use Filament\Forms\Components\Select;
+use Filament\Notifications\Notification;
 use Filament\Tables\Columns\TextColumn;
 use Filament\Tables\Filters\SelectFilter;
 use Filament\Tables\Table;
-use App\Services\AssetAIService;
+use App\Services\AIService;
 
 class AssetsTable
 {
@@ -82,6 +83,34 @@ class AssetsTable
                             'department_id' => $data['assigned_to_department_id'] ?? null,
                             'action' => 'ASSIGNED',
                         ]);
+                    }),
+                Action::make('generate_summary')
+                    ->label('AI Summary')
+                    ->icon('heroicon-m-sparkles')
+                    ->color('info')
+                    ->requiresConfirmation()
+                    ->modalHeading('Generate AI Summary')
+                    ->modalDescription('This will analyze the asset history and overwrite the existing summary. Continue?')
+                    ->action(function (Asset $record) {
+                        try {
+                            $summary = (new AIService())->generateAssetSummary($record);
+
+                            $record->update(['ai_summary' => $summary]);
+
+                            Notification::make()
+                                        ->title('Asset Insight')
+                                        ->body($summary)
+                                        ->info()
+                                        ->persistent()
+                                        ->send();
+
+                        } catch (\Exception $e) {
+                            Notification::make()
+                                ->title('Generation Failed')
+                                ->body($e->getMessage())
+                                ->danger()
+                                ->send();
+                        }
                     }),
             ])
             ->toolbarActions([BulkActionGroup::make([DeleteBulkAction::make()])]);

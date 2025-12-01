@@ -14,7 +14,6 @@ use Filament\Tables\Table;
 class FilesRelationManager extends RelationManager
 {
     protected static string $relationship = 'files';
-    protected static ?string $recordTitleAttribute = 'file_name';
 
     public function table(Table $table): Table
     {

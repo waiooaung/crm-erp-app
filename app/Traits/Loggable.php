@@ -12,7 +12,7 @@ trait Loggable
     {
         static::created(function (Model $model) {
             // Renamed function call
-            self::recordActivity($model, 'created', $model->toArray());
+            self::recordActivity($model, 'CREATED', $model->toArray());
         });
 
         static::updated(function (Model $model) {

@@ -10,6 +10,11 @@ class CreateAsset extends CreateRecord
 {
     protected static string $resource = AssetResource::class;
 
+    protected function getRedirectUrl(): string
+    {
+        return $this->getResource()::getUrl('index');
+    }
+
     protected function afterCreate(): void
     {
         $attachments = $this->data['attachments'] ?? [];

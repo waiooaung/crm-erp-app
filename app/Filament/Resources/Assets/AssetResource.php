@@ -16,6 +16,7 @@ use Filament\Resources\Resource;
 use Filament\Schemas\Schema;
 use Filament\Support\Icons\Heroicon;
 use Filament\Tables\Table;
+use Illuminate\Database\Eloquent\Model;
 
 class AssetResource extends Resource
 {
@@ -24,6 +25,27 @@ class AssetResource extends Resource
     protected static string|BackedEnum|null $navigationIcon = Heroicon::OutlinedArchiveBox;
 
     protected static ?int $navigationSort = 1;
+
+    protected static ?string $recordTitleAttribute = 'name';
+    public static function getGloballySearchableAttributes(): array
+    {
+        return [
+            'name',
+            'serial_number',
+            'category',
+            'assignedUser.name',
+        ];
+    }
+
+    public static function getGlobalSearchResultDetails(Model $record): array
+    {
+        /** @var Asset $record */
+        return [
+            'Status' => $record->status,
+            'Serial' => $record->serial_number,
+            'User'   => $record->assignedUser?->name ?? 'Unassigned',
+        ];
+    }
 
     public static function form(Schema $schema): Schema
     {

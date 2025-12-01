@@ -1,19 +1,21 @@
 <?php
 
-namespace App\Filament\Resources\Assets\RelationManagers;
+namespace App\Filament\Resources\Issues\RelationManagers;
 
+use App\Filament\Resources\Activities\ActivityResource;
+use Filament\Actions\CreateAction;
 use Filament\Actions\ViewAction;
+use Filament\Forms\Components\KeyValue;
 use Filament\Resources\RelationManagers\RelationManager;
-use Filament\Tables\Table;
 use Filament\Tables\Columns\TextColumn;
-use Filament\Forms; // Keep this for the ViewAction inside the table
+use Filament\Tables\Table;
 use Illuminate\Database\Eloquent\Model;
 
 class ActivitiesRelationManager extends RelationManager
 {
     protected static string $relationship = 'activities';
 
-    protected static ?string $recordTitleAttribute = 'action';
+    protected static ?string $relatedResource = ActivityResource::class;
 
     public function table(Table $table): Table
     {
@@ -21,7 +23,7 @@ class ActivitiesRelationManager extends RelationManager
             ->columns([
                 TextColumn::make('user.name')->label('User')->icon('heroicon-m-user'),
 
-                TextColumn::make('action')
+                TextColumn::make('entity')
                     ->badge()
                     ->colors([
                         'success' => 'created',
@@ -65,8 +67,6 @@ class ActivitiesRelationManager extends RelationManager
 
                 TextColumn::make('created_at')->label('Occurred')->dateTime()->sortable(),
             ])
-            ->defaultSort('created_at', 'desc')
-            ->actions([
-            ]);
+            ->defaultSort('created_at', 'desc');
     }
 }
