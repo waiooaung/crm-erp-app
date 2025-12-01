@@ -1,0 +1,65 @@
+name: Deploy to DigitalOcean
+
+on:
+  push:
+    branches: ["main"]
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Deploy to Server via SSH
+        uses: appleboy/ssh-action@v1.0.3
+        with:
+          host: ${{ secrets.DO_HOST }}
+          username: ${{ secrets.DO_USERNAME }}
+          password: ${{ secrets.DO_PASSWORD }}
+          port: 22
+          script: |
+            # Navigate to project
+            cd /var/www/crm-erp-app
+
+            # Enable Maintenance Mode
+            php artisan down
+
+            # Pull latest changes
+            git pull origin main
+
+            # Install PHP Dependencies
+            composer install --no-dev --optimize-autoloader
+
+            # Install JS Dependencies & Build
+            npm install
+            npm run build
+
+            # Run Migrations (Force is required in production)
+            php artisan migrate --force
+
+            # Link Storage
+            php artisan storage:link
+
+            # Filament V4 optimizations
+            php artisan filament:optimize
+            php artisan icons:cache
+
+            # Clear and Cache Config/Routes
+            php artisan optimize:clear
+            php artisan config:cache
+            php artisan route:cache
+            php artisan view:cache
+
+            # Fix Permissions
+            sudo chown -R www-data:www-data /var/www/crm-erp-app
+
+            # DB migration
+            php artisan migrate --force
+
+            # Run Database Seeders (Force is required in production)
+            php artisan db:seed --force
+
+            # Bring site back up
+            php artisan up
