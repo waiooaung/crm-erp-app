@@ -1,8 +1,6 @@
-<p align="center"><a href="https://filamentphp.com" target="_blank"><img src="https://www.google.com/search?q=https://filamentphp.com/images/og.jpg" width="400" alt="Filament Logo"></a></p>
-
 AI-Powered Asset Management System
 
-An intelligent IT Asset Management (ITAM) system built with Laravel 11 and Filament V3. This application leverages OpenAI to automate data entry, classify maintenance issues, and generate natural language summaries for assets.
+An intelligent IT Asset Management (ITAM) system built with Laravel 12 and Filament V4. This application leverages OpenAI to automate data entry, classify maintenance issues, and generate natural language summaries for assets.
 
 🚀 Key AI Features
 
