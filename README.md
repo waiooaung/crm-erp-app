@@ -104,3 +104,9 @@ php artisan make:filament-user
 Start the local development server:
 
 php artisan serve
+
+## Test Account (seed data)
+
+| Role   | Username | Email            | Password    |
+|--------|----------|------------------|-------------|
+| Admin  | admin    | admin@example.com| password    |
