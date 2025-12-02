@@ -9,6 +9,15 @@ class DepartmentSeeder extends Seeder
 {
     public function run(): void
     {
-        Department::insert([['name' => 'Human Resources'], ['name' => 'IT Department'], ['name' => 'Finance'], ['name' => 'Operations']]);
+        $departments = [
+            'Human Resources',
+            'IT Department',
+            'Finance',
+            'Operations'
+        ];
+
+        foreach ($departments as $name) {
+            Department::firstOrCreate(['name' => $name]);
+        }
     }
 }
