@@ -5,10 +5,12 @@ namespace App\Filament\Resources\Assets\Schemas;
 use App\Models\Department;
 use App\Models\User;
 use App\Services\AIService;
+use Filament\Actions\Action;
 use Filament\Forms\Components\DatePicker;
 use Filament\Forms\Components\FileUpload;
 use Filament\Forms\Components\Select;
 use Filament\Forms\Components\TextInput;
+use Filament\Notifications\Notification;
 use Filament\Schemas\Components\Utilities\Get;
 use Filament\Schemas\Components\Utilities\Set;
 use Filament\Schemas\Schema;
@@ -20,12 +22,42 @@ class AssetForm
     public static function configure(Schema $schema): Schema
     {
         return $schema->components([
-            TextInput::make('name')->required()->live(onBlur: true)
-                ->afterStateUpdated(function ($state, Set $set) {
-                    $category = (new AIService)->suggestCategory($state);
-                    $set('category', $category);
-                }),
-            TextInput::make('category'),
+            TextInput::make('name')
+                ->label('Asset Name')
+                ->required()
+
+                ->suffixAction(
+                    Action::make('generateCategory')
+                        ->icon('heroicon-m-sparkles')
+                        ->color('warning')
+                        ->tooltip('Generate Category with AI')
+                        ->action(function (Get $get, Set $set) {
+                            $name = $get('name');
+
+                            if (!$name) {
+                                Notification::make()->title('Please enter a name first')->warning()->send();
+                                return;
+                            }
+
+
+                            Notification::make()->title('AI Generating...')->info()->send();
+
+                            try {
+
+                                $category = app(AIService::class)->suggestCategory($name);
+
+
+                                $set('category', $category);
+
+                                Notification::make()->title('Category found!')->success()->send();
+                            } catch (\Exception $e) {
+                                Notification::make()->title('AI Failed')->body('Try again manually.')->danger()->send();
+                            }
+                        })
+                ),
+            TextInput::make('category')
+                ->required()
+                ->placeholder('Click the sparkles icon above to auto-fill'),
             TextInput::make('serial_number'),
             Select::make('status')
                 ->options([
