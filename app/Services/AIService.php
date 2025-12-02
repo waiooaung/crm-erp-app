@@ -11,8 +11,22 @@ class AIService
     {
         $result = OpenAI::chat()->create([
             'model' => 'gpt-4o-mini',
-            'messages' => [['role' => 'system', 'content' => 'Return only the category name (e.g., "Electronics", "Furniture", "Vehicle") for this asset.'], ['role' => 'user', 'content' => "Asset Name: $assetName"]],
-        ]);
+            'messages' => [
+                [
+                    'role' => 'system',
+                    'content' => 'You are an Asset Classifier. Analyze the asset name.
+                    Return ONLY a precise hierarchical category string in the format: "Parent Category > Child Category".
+
+                    Examples:
+                    - Input: "MacBook Pro" -> Output: "Electronics > Laptop"
+                    - Input: "Nespresso Machine" -> Output: "Kitchen > Appliance"
+                    - Input: "Herman Miller Chair" -> Output: "Furniture > Seating"
+                    - Input: "Daikin AC Unit" -> Output: "HVAC > Air Conditioner"
+                    ',
+                ],
+                ['role' => 'user', 'content' => "Asset Name: $assetName"]],
+            ]
+        );
         return $result->choices[0]->message->content;
     }
 
@@ -36,10 +50,22 @@ class AIService
         $response = OpenAI::chat()->create([
             'model' => 'gpt-4o-mini',
             'messages' => [
-                [
-                    'role' => 'system',
-                    'content' => 'You are an IT Asset Manager. Write a concise, professional 2-sentence summary of this asset. Focus on its current availability, who has it, and its financial/warranty status.',
-                ],
+            [
+                'role' => 'system',
+                'content' => 'You are an expert General Asset & Operations Manager.
+                You manage a diverse inventory ranging from IT Electronics (Laptops, Servers) to Facility Equipment (Kitchen Appliances, HVAC, Furniture).
+
+                Analyze the asset details provided. Write a concise, professional 2-sentence summary.
+
+                Guidelines:
+                1. Identify the Main Category (e.g., "Electronics > Laptop" or "Kitchen > Appliance").
+                2. Adapt the summary based on the type:
+                - IT Assets: Focus on specs, user assignment, and warranty.
+                - Facility/Kitchen (e.g., Coffee Maker, AC): Focus on operational status (Functional/Broken) and maintenance needs.
+                - Furniture: Focus on condition and location.
+
+                Example Output: "Industrial-grade coffee maker located in the Main Pantry; currently operational but requires descaling maintenance."',
+            ],
                 [
                     'role' => 'user',
                     'content' => "Analyze this asset data: $promptData",
@@ -58,16 +84,26 @@ class AIService
             'messages' => [
                 [
                     'role' => 'system',
-                    'content' => 'You are an IT Support Manager or Admin Manager. Analyze the issue description.
-                    Return a JSON object with two keys:
-                    1. "classification" (One of: Hardware, Software, Network, User Error, Other)
+                    'content' => 'You are an intelligent Facility & IT Operations Manager. Analyze the reported issue description.
+                    The issue could come from any department and involve any type of asset (e.g., Laptops, Air Conditioners, Plumbing, Vehicles, Furniture).
+
+                    Return a STRICT JSON object with two keys:
+                    1. "classification" (Choose the best fit:
+                    - "IT Hardware" (Computers, Printers)
+                    - "Software/Network" (Internet, Apps)
+                    - "HVAC" (Air Conditioning, Heating, Ventilation)
+                    - "Electrical" (Lights, Power Sockets)
+                    - "Plumbing/Water" (Leaks, Taps)
+                    - "General Maintenance" (Broken Furniture, Doors, Paint)
+                    - "Other")
+
                     2. "priority" (One of: LOW, MEDIUM, HIGH, CRITICAL).
 
-                    Rules:
-                    - Fire/Safety/Security = CRITICAL
-                    - Total device failure = HIGH
-                    - Glitches/Slowness = MEDIUM
-                    - Cosmetic/Questions = LOW',
+                    Priority Logic:
+                    - CRITICAL: Immediate safety hazard (Fire, Sparks, Gas Leak) or Security breach.
+                    - HIGH: Asset is completely dead or causing work stoppage (e.g., Server down, AC broken in server room/heatwave).
+                    - MEDIUM: Asset is working but performance is degraded (e.g., AC not cooling well, noisy fan, slow computer).
+                    - LOW: Cosmetic issues, general inquiries, or minor discomfort.',
                 ],
                 [
                     'role' => 'user',
